@@ -29,7 +29,6 @@
 // app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -45,15 +44,18 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// Configure CORS using CLIENT_URL from .env
-app.use(cors({
-  origin: process.env.CLIENT_URL, // Allow requests from the frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
-  credentials: true, // Allow cookies/authorization headers
-}));
+// Configure CORS
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+};
 
-// Explicitly handle preflight requests (optional)
-app.options('*', cors());
+app.use(cors(corsOptions));
+
+// Explicitly handle preflight requests
+app.options('*', cors(corsOptions));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
@@ -70,6 +72,12 @@ app.use('/api/resume', resumeRoutes);
 // Catch-all route for invalid paths
 app.use((req, res, next) => {
   res.status(404).json({ msg: 'Route not found' });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ msg: 'Internal Server Error' });
 });
 
 // Start the server
