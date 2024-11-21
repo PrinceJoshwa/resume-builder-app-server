@@ -72,19 +72,27 @@ dotenv.config();
 
 const app = express();
 
-// Middleware for CORS
+// Middleware
 const corsOptions = {
   origin: process.env.CLIENT_URL || 'https://resume-builder-app-client.vercel.app',
-  credentials: false, // Allow cookies and credentials
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  credentials: true, // Allow cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow specific methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
 };
 app.use(cors(corsOptions));
 
-// Explicitly handle OPTIONS requests globally
+// Explicitly handle preflight requests
 app.options('*', cors(corsOptions));
 
+// Parse incoming JSON requests
 app.use(express.json());
+
+// Debugging logs for incoming requests
+app.use((req, res, next) => {
+  console.log(`Request Method: ${req.method}, Request URL: ${req.url}`);
+  console.log('Request Headers:', req.headers);
+  next();
+});
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
