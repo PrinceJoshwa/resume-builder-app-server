@@ -75,7 +75,7 @@ const app = express();
 // Middleware for CORS
 const corsOptions = {
   origin: process.env.CLIENT_URL || 'https://resume-builder-app-client.vercel.app',
-  credentials: true, // Allow cookies and credentials
+  credentials: false, // Allow cookies and credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
 };
